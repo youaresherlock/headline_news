@@ -2,6 +2,7 @@
 # -*- coding:utf8 -*-
 import sys
 from flask import Flask
+from redis import StrictRedis
 from flask_sqlalchemy import SQLAlchemy
 from os.path import dirname, abspath
 
@@ -15,6 +16,8 @@ from utils.constants import EXTRA_ENV_COINFIG
 
 # sqlalchemy组件对象
 db = SQLAlchemy()
+# 创建redis组件对象
+redis_client = None  # type: StrictRedis
 
 
 def register_extensions(app):
@@ -22,6 +25,11 @@ def register_extensions(app):
 
     # 延后关联sqlalchemy
     db.init_app(app)
+
+    # 对redis组件初始化
+    global redis_client
+    # decode_response 可以将响应bytes自动转换为str
+    redis_client = StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], decode_responses=True)
 
 
 def create_flask_app(type):
