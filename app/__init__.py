@@ -32,6 +32,13 @@ def register_extensions(app):
     redis_client = StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], decode_responses=True)
 
 
+def register_bp(app: Flask):
+    """注册蓝图"""
+    # 建议局部导入, 避免视图文件中使用的组件未完成初始化
+    from app.resources.user import user_bp
+    app.register_blueprint(user_bp)
+
+
 def create_flask_app(type):
     """
     创建flask应用
@@ -58,6 +65,8 @@ def create_app(type):
 
     # 组件初始化
     register_extensions(app)
+
+    register_bp(app)
 
     return app
 

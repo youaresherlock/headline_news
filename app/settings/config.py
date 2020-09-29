@@ -11,7 +11,7 @@ class DefaultConfig(object):
 
     # redis配置
     REDIS_HOST = '127.0.0.1'  # ip
-    REDIS_PORT = 6379  # 端口
+    REDIS_PORT = 6381  # 主redis的端口号
 
 
 # 定义字典记录 配置类型和配置子类的关系
