@@ -31,6 +31,10 @@ def register_extensions(app):
     # decode_response 可以将响应bytes自动转换为str
     redis_client = StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], decode_responses=True)
 
+    # 添加转换器
+    from utils.converters import register_converters
+    register_converters(app)
+
 
 def register_bp(app: Flask):
     """注册蓝图"""
