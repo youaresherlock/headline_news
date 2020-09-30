@@ -6,9 +6,12 @@ from app import db
 from app import redis_client
 from models.user import User
 from datetime import datetime
+from flask import current_app
+from datetime import timedelta
 from flask_restful import Resource
 from sqlalchemy.orm import load_only
 from flask_restful.inputs import regex
+from utils.jwt_util import generate_jwt
 from utils.constants import SMS_CODE_EXPIRE
 from utils.parser import mobile as mobile_type
 from flask_restful.reqparse import RequestParser
@@ -56,7 +59,11 @@ class LoginResource(Resource):
         db.session.commit()
         # 返回结果
 
-        return {"user_id": user.id}, 201
+        # 生成令牌
+        token = generate_jwt({'userid': user.id},
+                             datetime.utcnow() + timedelta(days=current_app.config['JWT_EXPIRE_DAYS']))
+
+        return {"token": token}, 201
 
 
 

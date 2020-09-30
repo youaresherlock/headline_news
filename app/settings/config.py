@@ -14,6 +14,11 @@ class DefaultConfig(object):
     # REDIS_PORT = 6381  # 主redis的端口号
     REDIS_PORT = 6379
 
+    # JWT
+    JWT_SECRET = 'N1UzXOFKJRZk5cslhMDcbqHZ0lKvCAyL85fufewVmUF9bGPAlAXw9w=='  # 秘钥
+    JWT_EXPIRE_DAYS = 14
+
+
 # 定义字典记录 配置类型和配置子类的关系
 config_dict = {
     'dev': DefaultConfig
