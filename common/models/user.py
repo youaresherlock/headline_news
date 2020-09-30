@@ -1,5 +1,9 @@
 #!usr/bin/python
 # -*- coding:utf8 -*-
+"""
+注意: 如果没有给对应字段的类属性设置default参数,且添加数据时也没有给该字段赋值,
+则sqlalchemy会给该字段设置默认值None 
+"""
 from app import db
 
 
