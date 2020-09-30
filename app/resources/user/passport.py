@@ -2,9 +2,16 @@
 # -*- coding:utf8 -*-
 """用于存放用户认证相关的视图函数"""
 import random
+from app import db
 from app import redis_client
+from models.user import User
+from datetime import datetime
 from flask_restful import Resource
+from sqlalchemy.orm import load_only
+from flask_restful.inputs import regex
 from utils.constants import SMS_CODE_EXPIRE
+from utils.parser import mobile as mobile_type
+from flask_restful.reqparse import RequestParser
 
 
 class SMSCodeResource(Resource):
@@ -20,6 +27,36 @@ class SMSCodeResource(Resource):
         # 返回结果
 
         return {'mobile': mobile}
+
+
+class LoginResource(Resource):
+    """注册登录"""
+    def post(self):
+        # 获取参数
+        parser = RequestParser()
+        parser.add_argument('mobile', required=True, location='json', type=mobile_type)
+        parser.add_argument('code', required=True, location='json', type=regex(r'^\d{6}$'))
+        args = parser.parse_args()
+        mobile = args.mobile
+        code = args.code
+        # 校验短信验证码
+        key = 'app:code:{}'.format(mobile)
+        real_code = redis_client.get(key)
+        if not real_code or real_code != code:
+            return {'message': 'Invalid Code', 'data': None}, 400
+        # 删除验证码
+        redis_client.delete(key)
+        # 查询数据库
+        user = User.query.options(load_only(User.id)).filter(User.mobile == mobile).first()
+        if user:
+            user.last_login = datetime.now()
+        else:
+            user = User(mobile=mobile, name=mobile, last_login=datetime.now())
+            db.session.add(user)
+        db.session.commit()
+        # 返回结果
+
+        return {"user_id": user.id}, 201
 
 
 
