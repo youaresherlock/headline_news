@@ -3,6 +3,7 @@
 import sys
 from flask import Flask
 from redis import StrictRedis
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from os.path import dirname, abspath
 
@@ -34,6 +35,12 @@ def register_extensions(app):
     # 添加转换器
     from utils.converters import register_converters
     register_converters(app)
+
+    # 数据迁移组件初始化
+    Migrate(app, db)
+
+    # 导入模型类 (让项目发现对应的模型类)
+    from models import user
 
 
 def register_bp(app: Flask):

@@ -15,7 +15,7 @@ class User(db.Model):
     article_count = db.Column(db.Integer, default=0, doc='作品数')
     following_count = db.Column(db.Integer, default=0, doc='关注的人数')
     fans_count = db.Column(db.Integer, default=0, doc='粉丝数')
-    profile_photo = db.COlumn(db.String(130), doc='头像')
+    profile_photo = db.Column(db.String(130), doc='头像')
 
     def to_dict(self):
         """模型转字典,用于序列化处理"""
