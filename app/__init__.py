@@ -42,6 +42,10 @@ def register_extensions(app):
     # 导入模型类 (让项目发现对应的模型类)
     from models import user
 
+    # 添加钩子函数
+    from utils.middlewares import get_user_info
+    app.before_request(get_user_info)
+
 
 def register_bp(app: Flask):
     """注册蓝图"""
