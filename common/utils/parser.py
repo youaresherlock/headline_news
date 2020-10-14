@@ -1,9 +1,8 @@
 #!usr/bin/python
 # -*- coding:utf8 -*-
 # common/utils/parser.py
-
-
 import re
+import imghdr
 import base64
 import imghdr
 from datetime import datetime
@@ -40,3 +39,27 @@ def id_number(value):
         return value.upper()
     else:
         raise ValueError('Invalid id number.')
+
+
+def image_file(value):
+    """
+    检查是否是图片文件
+    :param value: value是文件对象
+    :return:
+    """
+    try:
+        file_type = imghdr.what(value)
+    except Exception:
+        raise ValueError('Invalid image.')
+    else:
+        if file_type:
+            return value
+        else:
+            raise ValueError('Invalid image.')
+
+
+
+
+
+
+
