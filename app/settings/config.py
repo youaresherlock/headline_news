@@ -24,6 +24,9 @@ class DefaultConfig(object):
     QINIU_BUCKET_NAME = 'sh35'
     QINIU_DOMAIN = 'http://q7f6ieukf.bkt.clouddn.com/'
 
+    # CORS
+    CORS_ORIGINS = ['http://127.0.0.1:5000']  # 限定允许访问的域名, 不设置则全部允许
+
 
 # 定义字典记录 配置类型和配置子类的关系
 config_dict = {

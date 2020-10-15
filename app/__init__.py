@@ -2,6 +2,7 @@
 # -*- coding:utf8 -*-
 import sys
 from flask import Flask
+from flask_cors import CORS
 from redis import StrictRedis
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -45,6 +46,9 @@ def register_extensions(app):
     # 添加钩子函数
     from utils.middlewares import get_user_info
     app.before_request(get_user_info)
+
+    # 安装flask-cors,配置跨域请求
+    CORS(app, supports_credentials=True)  # 设置supports_credentials=True, 则允许跨域传输cookie
 
 
 def register_bp(app: Flask):
