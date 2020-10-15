@@ -3,6 +3,7 @@
 # 在article包的初始化文件中进行蓝图的初始化处理
 from flask import Blueprint
 from flask_restful import Api
+from .channel import AllChannelResource
 from utils.constants import BASE_URL_PRIFIX
 
 
@@ -16,6 +17,7 @@ article_api = Api(article_bp)
 from utils.output import output_json
 article_api.representation('application/json')(output_json)
 
+article_api.add_resource(AllChannelResource, '/channels')
 
 
 
