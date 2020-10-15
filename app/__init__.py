@@ -41,7 +41,7 @@ def register_extensions(app):
     Migrate(app, db)
 
     # 导入模型类 (让项目发现对应的模型类)
-    from models import user
+    from models import user, article
 
     # 添加钩子函数
     from utils.middlewares import get_user_info
@@ -49,9 +49,6 @@ def register_extensions(app):
 
     # 安装flask-cors,配置跨域请求
     CORS(app, supports_credentials=True)  # 设置supports_credentials=True, 则允许跨域传输cookie
-
-    # 导入模型类
-    from models import user, article
 
 
 def register_bp(app: Flask):
