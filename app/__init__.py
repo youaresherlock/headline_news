@@ -50,6 +50,9 @@ def register_extensions(app):
     # 安装flask-cors,配置跨域请求
     CORS(app, supports_credentials=True)  # 设置supports_credentials=True, 则允许跨域传输cookie
 
+    # 导入模型类
+    from models import user, article
+
 
 def register_bp(app: Flask):
     """注册蓝图"""
