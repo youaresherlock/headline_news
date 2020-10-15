@@ -56,6 +56,8 @@ def register_bp(app: Flask):
     # 建议局部导入, 避免视图文件中使用的组件未完成初始化
     from app.resources.user import user_bp
     app.register_blueprint(user_bp)
+    from app.resources.article import article_bp
+    app.register_blueprint(article_bp)
 
 
 def create_flask_app(type):
