@@ -2,6 +2,7 @@
 # -*- coding:utf8 -*-
 from app import db
 from datetime import datetime
+from sqlalchemy.dialects.mysql import DATETIME
 
 
 class Channel(db.Model):
@@ -47,7 +48,10 @@ class Article(db.Model):
     channel_id = db.Column(db.Integer, doc='频道id')
     title = db.Column(db.String(130), doc='标题')
     cover = db.Column(db.JSON, doc='封面')
-    ctime = db.Column(db.Datetime, default=datetime.now, doc='创建时间')
+    # db.Datetime对应MYSQL的字段时datetime数据类型,以YYYY-MM-DD HH:MM:SS显示
+    # MYSQL提供了另一种类似于DATETIME, 叫做TIMESTAMP的时间数据类型
+    # ctime = db.Column(db.Datetime, default=datetime.now, doc='创建时间')
+    ctime = db.Column(DATETIME(fsp=3), default=datetime.now, doc='创建时间')
     status = db.Column(db.Integer, default=0, doc='帖文状态')
     comment_count = db.Column(db.Integer, default=0, doc='评论数')
 
