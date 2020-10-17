@@ -51,6 +51,8 @@ class Article(db.Model):
     # db.Datetime对应MYSQL的字段时datetime数据类型,以YYYY-MM-DD HH:MM:SS显示
     # MYSQL提供了另一种类似于DATETIME, 叫做TIMESTAMP的时间数据类型
     # ctime = db.Column(db.Datetime, default=datetime.now, doc='创建时间')
+    # 进行flask db migrate进行数据迁移发现不了字段的改变，使用SQL语句进行修改
+    # alter table news_article_basic modify column ctime datetime(3);
     ctime = db.Column(DATETIME(fsp=3), default=datetime.now, doc='创建时间')
     status = db.Column(db.Integer, default=0, doc='帖文状态')
     comment_count = db.Column(db.Integer, default=0, doc='评论数')
