@@ -66,6 +66,29 @@ class ArticleContent(db.Model):
     content = db.Column(db.Text, doc='贴文内容')
 
 
+class Collection(db.Model):
+    """用户收藏表"""
+    __tablename__ = 'news_collection'
+
+    id = db.Column(db.Integer, primary_key=True, doc='主键id')
+    user_id = db.Column(db.Integer, doc='用户id')
+    article_id = db.Column(db.Integer, doc='文章id')
+    is_deleted = db.Column(db.Boolean, default=False, doc='是否删除')
+
+
+class Attitude(db.Model):
+    """文章态度表"""
+    __tablename__ = 'news_attitude'
+
+    class ATTITUDE:
+        DISLIKE = 0  # 不喜欢
+        LIKING = 1  # 喜欢
+        DELETE = -1  # 无态度
+
+    id = db.Column(db.Integer, primary_key=True, doc='主键id')
+    user_id = db.Column(db.Integer, doc='用户id')
+    article_id = db.Column(db.Integer, doc='文章id')
+    attitude = db.Column(db.Integer, doc='态度')
 
 
 

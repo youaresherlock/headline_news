@@ -84,33 +84,4 @@ class ArticleDetailResource(Resource):
         }
 
         # 返回数据
-        return article_dict
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return {'data': article_dict}

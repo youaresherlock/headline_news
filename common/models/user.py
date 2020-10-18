@@ -5,6 +5,7 @@
 则sqlalchemy会给该字段设置默认值None 
 """
 from app import db
+from datetime import datetime
 
 
 class User(db.Model):
@@ -33,6 +34,22 @@ class User(db.Model):
             'follow_count': self.following_count,
             'fans_count': self.fans_count
         }
+
+
+class Relation(db.Model):
+    """用户关系表"""
+    __tablename__ = 'user_relation'
+
+    class RELATION:
+        DELETE = 0  # 无关系
+        FOLLOW = 1  # 关注
+        BLACKLIST = 2  # 黑名单
+
+    id = db.Column(db.Integer, primary_key=True, doc='主键id')
+    user_id = db.Column(db.Integer, doc='用户id')
+    author_id = db.Column(db.Integer, doc='用户目标id')
+    relation = db.Column(db.Integer, doc='关系')
+    update_time = db.Column(db.DateTime, default=datetime.now, doc='更新时间')
 
 
 
