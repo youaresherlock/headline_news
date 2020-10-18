@@ -58,6 +58,13 @@ class Article(db.Model):
     comment_count = db.Column(db.Integer, default=0, doc='评论数')
 
 
+class ArticleContent(db.Model):
+    """文章内容表"""
+    __tablename__ = 'news_article_content'
+
+    article_id = db.Column(db.Integer, primary_key=True, doc='文章id')
+    content = db.Column(db.Text, doc='贴文内容')
+
 
 
 
