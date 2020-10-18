@@ -5,6 +5,7 @@ from models.user import User
 from datetime import datetime
 from models.article import Article
 from flask_restful import Resource
+from models.article import ArticleContent
 from utils.constants import HOME_PRE_PAGE
 from flask_restful.reqparse import RequestParser
 
@@ -52,7 +53,38 @@ class ArticleListResource(Resource):
         return {'results': articles, 'pre_timestamp': pre_timestamp}
 
 
+class ArticleDetailResource(Resource):
+    def get(self, article_id):
+        """
+        查询来自两部分
+        基础数据 文章/作者数据
+        关系数据 关注/点赞/收藏数据
+        :param article_id:
+        :return:
+        """
+        # 根据文章id查询文章数据
+        data = db.session.\
+            query(Article.id, Article.title, Article.ctime, Article.user_id, User.name, User.profile_photo, ArticleContent.content).\
+            join(User, Article.user_id == User.id).\
+            join(ArticleContent, ArticleContent.article_id == Article.id).\
+            filter(Article.id == article_id).first()
 
+        # 序列化处理
+        article_dict = {
+            'art_id': data.id,
+            'title': data.title,
+            'pubdate': data.ctime.isoformat(),
+            'aut_id': data.user_id,
+            'aut_name': data.name,
+            'aut_photo': data.profile_photo,
+            'content': data.content,
+            'is_followed': False,
+            'attitude': -1,
+            'is_collected': False
+        }
+
+        # 返回数据
+        return article_dict
 
 
 

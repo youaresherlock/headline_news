@@ -5,6 +5,7 @@ from flask import Blueprint
 from flask_restful import Api
 from .channel import AllChannelResource
 from .articles import ArticleListResource
+from .articles import ArticleDetailResource
 from utils.constants import BASE_URL_PRIFIX
 
 
@@ -20,7 +21,7 @@ article_api.representation('application/json')(output_json)
 
 article_api.add_resource(AllChannelResource, '/channels')
 article_api.add_resource(ArticleListResource, '/articles')
-
+article_api.add_resource(ArticleDetailResource, '/articles/<int:article_id>')
 
 
 
