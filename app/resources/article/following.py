@@ -11,7 +11,7 @@ from flask_restful.reqparse import RequestParser
 
 
 class FollowUserResource(Resource):
-    method_decorators = {'post': [login_required]}
+    method_decorators = {'post': [login_required], 'get': [login_required]}
 
     def post(self):
         # 获取参数
@@ -42,6 +42,33 @@ class FollowUserResource(Resource):
 
         # 返回结果
         return {'target': author_id}
+
+    def get(self):
+        """获取关注列表"""
+        # 获取参数
+        userid = g.userid
+        parser = RequestParser()
+        parser.add_argument('page', default=1, location='args', type=int)
+        parser.add_argument('per_page', default=10, location='args', type=int)
+        args = parser.parse_args()
+        page = args.page
+        per_page = args.per_page
+
+        # 数据查询 join代替关联查询 & 当前用户的关注列表 & 关注事件倒序 & 分页
+        pn = User.query.options(load_only(User.id, User.name, User.profile_photo, User.fans)).\
+            join(Relation, User.id == Relation.author_id).\
+            filter(Relation.user_id == userid, Relation.relation == Relation.RELATION.FOLLOW).\
+            order_by(Relation.update_time.desc()).paginate(page, per_page)
+
+        data = [{
+            'id': item.id, 
+            'name': item.name,
+            'photo': item.profile_photo,
+            'fans_count': item.fans_count,
+            'mutual_follow': False
+        } for item in pn.items]
+
+        return {'results': data, 'total_count': pn.total, 'per_page': per_page, 'page': pn.page}
 
 
 class UnFollowUserResource(Resource):
