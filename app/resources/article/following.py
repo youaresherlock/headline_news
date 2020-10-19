@@ -60,15 +60,29 @@ class FollowUserResource(Resource):
             filter(Relation.user_id == userid, Relation.relation == Relation.RELATION.FOLLOW).\
             order_by(Relation.update_time.desc()).paginate(page, per_page)
 
-        data = [{
-            'id': item.id, 
-            'name': item.name,
-            'photo': item.profile_photo,
-            'fans_count': item.fans_count,
-            'mutual_follow': False
-        } for item in pn.items]
+        """相互关注部分"""
+        # 查询当前用户的粉丝列表
+        fans_list = Relation.query.options(load_only(Relation.user_id)).\
+            filter(Relation.author_id == userid, Relation.relation == Relation.RELATION.FOLLOW).all()
 
-        return {'results': data, 'total_count': pn.total, 'per_page': per_page, 'page': pn.page}
+        author_list = []
+        for item in pn.items:
+            author_dict = {
+                'id': item.id,
+                'name': item.name,
+                'photo': item.profile_photo,
+                'fans_count': item.fans_count,
+                'mutual_follow': False
+            }
+            # 判断取出的作者是否在当前用户的粉丝列表中 (如果在, 说明相互关注)
+            for fans in fans_list:
+                if item.id == fans.user_id:
+                    author_dict['mutual_follow'] = True
+                    break 
+
+            author_list.append(author_dict)
+
+        return {'results': author_list, 'total_count': pn.total, 'per_page': per_page, 'page': pn.page}
 
 
 class UnFollowUserResource(Resource):
