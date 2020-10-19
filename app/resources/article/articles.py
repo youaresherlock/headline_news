@@ -114,7 +114,7 @@ class ArticleDetailResource(Resource):
             else:
                 attitude = atti_obj.attitude
 
-            article_dict['attitude'] = attitude 
+            article_dict['attitude'] = attitude
 
         # 返回数据
         return {'data': article_dict}
