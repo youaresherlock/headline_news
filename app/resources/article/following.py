@@ -55,6 +55,8 @@ class FollowUserResource(Resource):
         per_page = args.per_page
 
         # 数据查询 join代替关联查询 & 当前用户的关注列表 & 关注事件倒序 & 分页
+        # error_out默认为True,如果分页越界则抛出404,设置为False则不会报错,返回空数据
+        # order_by(Relation.update_time.desc()).paginate(page, per_page, error_out=False)
         pn = User.query.options(load_only(User.id, User.name, User.profile_photo, User.fans)).\
             join(Relation, User.id == Relation.author_id).\
             filter(Relation.user_id == userid, Relation.relation == Relation.RELATION.FOLLOW).\
@@ -78,7 +80,7 @@ class FollowUserResource(Resource):
             for fans in fans_list:
                 if item.id == fans.user_id:
                     author_dict['mutual_follow'] = True
-                    break 
+                    break
 
             author_list.append(author_dict)
 
