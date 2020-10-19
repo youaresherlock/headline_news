@@ -16,7 +16,7 @@ from flask_restful.reqparse import RequestParser
 
 
 class ArticleListResource(Resource):
-    @property
+
     def get(self):
         # 获取参数 前端传递频道id以及毫秒的时间戳
         parser = RequestParser()

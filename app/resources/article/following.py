@@ -44,6 +44,26 @@ class FollowUserResource(Resource):
         return {'target': author_id}
 
 
+class UnFollowUserResource(Resource):
+    method_decorators = {'delete': [login_required]}
+
+    def delete(self, target):
+        """取消关注, DELETE方法具有幂等性"""
+        # 获取参数
+        userid = g.userid
+        # 更新用户关系 删除关系, 将relation字段进行更新
+        Relation.query.filter(Relation.user_id == userid, Relation.author_id == target, Relation.relation == Relation.RELATION.FOLLOW).\
+            update({'relation': Relation.RELATION.DELETE, 'update_time': datetime.now()})
+        # 让作者的粉丝数量-1
+        User.query.filter(User.id == userid).update({'fans_count': User.fans_count - 1})
+        # 让用户的关注数量-1
+        User.query.filter(User.id == target).update({'following_count': User.following_count - 1})
+
+        db.session.commit()
+
+        # 返回结果
+        return {'target': target}
+
 
 
 

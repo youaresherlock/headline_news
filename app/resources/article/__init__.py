@@ -7,6 +7,7 @@ from .channel import AllChannelResource
 from .following import FollowUserResource
 from .articles import ArticleListResource
 from .articles import ArticleDetailResource
+from .following import UnFollowUserResource
 from utils.constants import BASE_URL_PRIFIX
 
 
@@ -24,7 +25,7 @@ article_api.add_resource(AllChannelResource, '/channels')
 article_api.add_resource(ArticleListResource, '/articles')
 article_api.add_resource(ArticleDetailResource, '/articles/<int:article_id>')
 article_api.add_resource(FollowUserResource, '/user/followings')
-
+article_api.add_resource(UnFollowUserResource, '/user/followings/<int:target>')
 
 
 
