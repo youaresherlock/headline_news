@@ -58,25 +58,57 @@ class CommentsResource(Resource):
             return {'com_id': comment.id, 'target': target}
 
     def get(self):
-        """获取评论列表"""
+        """获取评论列表/父评论回复列表
+        请求参数:
+        type a 评论列表 c回复列表
+        source 文章id/父评论id
+        offset 评论数据的偏移量,值为评论id,表示从该id开始取,不传表示从头开始取
+        limit 获取的评论条数
+        """
         # 获取参数
         parser = RequestParser()
         parser.add_argument('source', required=True, location='args', type=int)  # 文章id
         parser.add_argument('offset', default=0, location='args', type=int)  # 评论id
         parser.add_argument('limit', default=10, location='args', type=int)  # 条数
+        parser.add_argument('type', required=True, location='args', type=regex(r'[ac]'))
         args = parser.parse_args()
         source = args.source
         offset = args.offset
         page_count = args.limit
+        type_flag = args.type
 
-        # 查询该文章的评论 & 分页(评论id > offset)
-        data = db.session.query(Comment.id, Comment.user_id, User.name,
-                                User.profile_photo,Comment.ctime,
-                                Comment.content, Comment.reply_count,
-                                Comment.like_count).\
-            join(User, Comment.user_id == User.id).\
-            filter(Comment.article_id == source, Comment.id > offset).\
-            limit(page_count).all()
+        # 评论列表
+        if type_flag == 'a':
+            comments = db.session.query(Comment.id, Comment.user_id, User.name,
+                                        User.profile_photo, Comment.ctime,
+                                        Comment.content, Comment.reply_count,
+                                        Comment.like_count). \
+                join(User, Comment.user_id == User.id). \
+                filter(Comment.article_id == source, Comment.id > offset, Comment.parent_id == 0). \
+                limit(page_count).all()
+
+            # 查询评论的总数
+            count = Comment.query.filter(Comment.article_id == source, Comment.parent_id == 0).count()
+            # 所有评论中最后一条的id
+            end_comment = Comment.query.options(load_only(Comment.id)).\
+                filter(Comment.article_id == source, Comment.parent_id == 0).\
+                order_by(Comment.id.desc()).first()
+        # 回复列表
+        else:
+            comments = db.session.query(Comment.id, Comment.user_id, User.name,
+                                        User.profile_photo, Comment.ctime,
+                                        Comment.content, Comment.reply_count,
+                                        Comment.like_count). \
+                join(User, Comment.user_id == User.id). \
+                filter(Comment.parent_id == source, Comment.id > offset). \
+                limit(page_count).all()
+
+            # 查询评论的总数
+            count = Comment.query.filter(Comment.parent_id == source).count()
+            # 所有评论中最后一条的id
+            end_comment = Comment.query.options(load_only(Comment.id)).\
+                filter(Comment.parent_id == source).\
+                order_by(Comment.id.desc()).first()
 
         comment_list = [
             {
@@ -89,15 +121,12 @@ class CommentsResource(Resource):
                 'reply_count': item.reply_count,
                 'like_count': item.like_count
             }
-            for item in data
+            for item in comments
         ]
-        # 查询评论的总数
-        count = Comment.query.filter(Comment.article_id == source).count()
-        # 所有评论中最后一条的id
-        end_comment = Comment.query.options(load_only(Comment.id)).filter(Comment.article_id == source).order_by(Comment.id.desc()).first()
+
         end_id = end_comment.id if end_comment else None
         # 本次请求中最后一条的id
-        last_id = data[-1].id if data else None
+        last_id = comments[-1].id if comments else None
 
         return {'results': comment_list, 'total_count': count, 'end_id': end_id, 'last_id': last_id}
 
