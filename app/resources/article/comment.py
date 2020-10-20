@@ -16,24 +16,46 @@ class CommentsResource(Resource):
     method_decorators = {'post': [login_required]}
 
     def post(self):
-        """发布评论"""
+        """发布评论/回复评论
+        对发布评论接口进行改造,让其同时可以实现发布和回复评论两个功能
+        传参:
+        token userid
+        target 文章Id
+        content 评论内容
+        parent_id 父评论id 可选
+        """
         # 获取参数
         userid = g.userid
         parser = RequestParser()
         parser.add_argument('target', required=True, location='json', type=int)
         parser.add_argument('content', required=True, location='json', type=regex(r'.+'))
+        parser.add_argument('parent_id', location='json', type=int)
         args = parser.parse_args()
         target = args.target  # 文章id
         content = args.content  # 评论内容
-        # 新增评论数据
-        comment = Comment(user_id=userid, article_id=target, content=content, parent_id=0)
-        db.session.add(comment)
-        # 让文章的评论数量+1
-        Article.query.filter(Article.id == target).update({'comment_count': Article.comment_count + 1})
-        db.session.commit()
-        # 返回结果
+        parent_id = args.parent_id  # 父评论id
+        # 判断发布评论/子评论
+        if parent_id:  # 发布子评论
+            # 新增子评论数据
+            sub_comment = Comment(user_id=userid, article_id=target, content=content, parent_id=parent_id)
+            db.session.add(sub_comment)
+            # 让父评论的回复数量+1
+            Comment.query.filter(Comment.id == parent_id).update({'reply_count': Comment.reply_count + 1})
 
-        return {'com_id': comment.id, 'target': target}
+            db.session.commit()
+
+            return {'com_id': sub_comment.id, 'target': target, 'parent_id': parent_id}
+        else:  # 发布评论
+            # 新增评论数据
+            comment = Comment(user_id=userid, article_id=target, content=content, parent_id=0)
+            db.session.add(comment)
+            # 让文章的评论数量+1
+            Article.query.filter(Article.id == target).update({'comment_count': Article.comment_count + 1})
+
+            db.session.commit()
+            # 返回结果
+
+            return {'com_id': comment.id, 'target': target}
 
     def get(self):
         """获取评论列表"""
